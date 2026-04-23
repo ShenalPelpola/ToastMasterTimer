@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-neutral: #0A0A0F;
+  --color-green: #10B981;
+  --color-yellow: #F59E0B;
+  --color-red: #EF4444;
+  --color-red-dark: #B91C1C;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--color-neutral);
+  color: #E2E8F0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Timer digit font */
+.font-timer {
+  font-family: 'Bebas Neue', cursive;
+  letter-spacing: 0.05em;
+}
+
+/* Smooth color transitions for timer background */
+.timer-bg-transition {
+  transition: background-color 0.6s ease-in-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #12121A;
+}
+::-webkit-scrollbar-thumb {
+  background: #252530;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a4a;
+}
+
+/* Selection */
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+  color: white;
+}
