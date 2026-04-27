@@ -7,7 +7,7 @@ import { Speaker } from '../types';
 
 export default function MeetingPage() {
   const navigate = useNavigate();
-  const { meeting, addSpeaker, reorderSpeakers, removeSpeaker, renameSpeaker } = useMeeting();
+  const { meeting, addSpeaker, reorderSpeakers, removeSpeaker, renameSpeaker, clearMeeting } = useMeeting();
   const [showAddForm, setShowAddForm] = useState(false);
   const [speakerName, setSpeakerName] = useState('');
   const [speechTypeId, setSpeechTypeId] = useState(speechTypes[0].id);
@@ -84,8 +84,26 @@ export default function MeetingPage() {
               </svg>
               Setup
             </button>
-            <h1 className="text-xl font-bold text-white font-body">{meeting.title}</h1>
-            <p className="text-sm text-gray-500 font-body mt-0.5">{meeting.date}</p>
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <h1 className="text-xl font-bold text-white font-body truncate">{meeting.title}</h1>
+                <p className="text-sm text-gray-500 font-body mt-0.5">{meeting.date}</p>
+              </div>
+              <button
+                onClick={() => {
+                  if (window.confirm('Start a new meeting? This will clear all current speakers and times.')) {
+                    clearMeeting();
+                    navigate('/setup');
+                  }
+                }}
+                className="text-xs text-red-500 hover:text-white hover:bg-red-600 font-body transition-all flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-800/40 hover:border-red-600 shrink-0"
+              >
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                New Meeting
+              </button>
+            </div>
           </div>
 
           {/* Stats */}

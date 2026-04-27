@@ -6,7 +6,13 @@ import { formatTimeVerbose } from '../utils/formatTime';
 
 export default function SetupPage() {
   const navigate = useNavigate();
-  const { meeting, createMeeting, addSpeaker, removeSpeaker, moveSpeaker, reorderSpeakers } = useMeeting();
+  const { meeting, createMeeting, addSpeaker, removeSpeaker, moveSpeaker, reorderSpeakers, clearMeeting } = useMeeting();
+
+  const handleClearMeeting = () => {
+    if (window.confirm('Start a new meeting? This will clear all current speakers and times.')) {
+      clearMeeting();
+    }
+  };
 
   const [meetingTitle, setMeetingTitle] = useState('');
   const [speakerName, setSpeakerName] = useState('');
@@ -108,9 +114,21 @@ export default function SetupPage() {
     <div className="min-h-screen p-6 max-w-2xl mx-auto">
       {/* Header */}
       <div className="animate-fade-in mb-8">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-2 h-2 rounded-full bg-timer-green animate-pulse-slow" />
-          <p className="text-sm text-gray-400 font-body tracking-widest uppercase">Meeting Setup</p>
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-timer-green animate-pulse-slow" />
+            <p className="text-sm text-gray-400 font-body tracking-widest uppercase">Meeting Setup</p>
+          </div>
+          <button
+            onClick={handleClearMeeting}
+            className="text-xs text-red-500 hover:text-white hover:bg-red-600 font-body transition-all flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-800/40 hover:border-red-600"
+            title="Clear and start a new meeting"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            New Meeting
+          </button>
         </div>
         <h1 className="text-3xl font-bold text-white font-body">{meeting.title}</h1>
         <p className="text-sm text-gray-500 mt-1 font-body">{meeting.date}</p>
