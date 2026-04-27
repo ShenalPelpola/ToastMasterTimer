@@ -7,12 +7,14 @@ import { Speaker } from '../types';
 
 export default function MeetingPage() {
   const navigate = useNavigate();
-  const { meeting, addSpeaker, reorderSpeakers } = useMeeting();
+  const { meeting, addSpeaker, reorderSpeakers, removeSpeaker, renameSpeaker } = useMeeting();
   const [showAddForm, setShowAddForm] = useState(false);
   const [speakerName, setSpeakerName] = useState('');
   const [speechTypeId, setSpeechTypeId] = useState(speechTypes[0].id);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const dragIdRef = useRef<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
 
   if (!meeting) {
     navigate('/setup');
@@ -132,7 +134,7 @@ export default function MeetingPage() {
                     {group.speakers.map((speaker) => (
                       <div
                         key={speaker.id}
-                        draggable
+                        draggable={editingId !== speaker.id}
                         onDragStart={(e) => {
                           dragIdRef.current = speaker.id;
                           e.dataTransfer.effectAllowed = 'move';
@@ -169,29 +171,101 @@ export default function MeetingPage() {
                             <circle cx="9" cy="17" r="1.5" /><circle cx="15" cy="17" r="1.5" />
                           </svg>
                         </div>
-                        <button
-                          onClick={() => handleTimerClick(speaker.id)}
-                          className={`flex-1 text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${
-                            speaker.completed
-                              ? 'bg-surface-900/50 hover:bg-surface-700/50'
-                              : 'bg-surface-700/50 hover:bg-surface-600/70'
-                          }`}
-                        >
-                          {statusDot(speaker)}
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-medium font-body truncate text-sm ${speaker.completed ? 'text-gray-400' : 'text-white'}`}>
-                              {speaker.name}
-                            </p>
+
+                        {editingId === speaker.id ? (
+                          /* Inline edit mode */
+                          <div className="flex-1 flex items-center gap-2 bg-surface-700 rounded-xl px-3 py-2">
+                            {statusDot(speaker)}
+                            <input
+                              autoFocus
+                              value={editingName}
+                              onChange={(e) => setEditingName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && editingName.trim()) {
+                                  renameSpeaker(speaker.id, editingName);
+                                  setEditingId(null);
+                                } else if (e.key === 'Escape') {
+                                  setEditingId(null);
+                                }
+                              }}
+                              className="flex-1 bg-transparent text-white text-sm font-body focus:outline-none min-w-0"
+                            />
+                            <button
+                              onClick={() => {
+                                if (editingName.trim()) renameSpeaker(speaker.id, editingName);
+                                setEditingId(null);
+                              }}
+                              className="text-timer-green hover:text-emerald-400 transition-colors shrink-0"
+                              title="Save"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={() => setEditingId(null)}
+                              className="text-gray-500 hover:text-gray-300 transition-colors shrink-0"
+                              title="Cancel"
+                            >
+                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
                           </div>
-                          {speaker.completed && speaker.elapsedTime != null ? (
-                            <span className="font-timer text-lg text-gray-400">{formatTime(speaker.elapsedTime)}</span>
-                          ) : (
-                            <svg className="w-4 h-4 text-gray-600 group-hover:text-timer-green transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          )}
-                        </button>
+                        ) : (
+                          /* Normal row */
+                          <div className={`flex-1 flex items-center gap-2 rounded-xl transition-all duration-200 ${
+                            speaker.completed ? 'bg-surface-900/50' : 'bg-surface-700/50'
+                          }`}>
+                            <button
+                              onClick={() => handleTimerClick(speaker.id)}
+                              className="flex-1 text-left p-3 flex items-center gap-3"
+                            >
+                              {statusDot(speaker)}
+                              <div className="flex-1 min-w-0">
+                                <p className={`font-medium font-body truncate text-sm ${speaker.completed ? 'text-gray-400' : 'text-white'}`}>
+                                  {speaker.name}
+                                </p>
+                              </div>
+                              {speaker.completed && speaker.elapsedTime != null ? (
+                                <span className="font-timer text-lg text-gray-400">{formatTime(speaker.elapsedTime)}</span>
+                              ) : (
+                                <svg className="w-4 h-4 text-gray-600 group-hover:text-timer-green transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                              )}
+                            </button>
+                            {/* Edit / Delete — appear on hover */}
+                            <div className="flex items-center gap-0.5 pr-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingId(speaker.id);
+                                  setEditingName(speaker.name);
+                                }}
+                                className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-surface-600 transition-all"
+                                title="Rename"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  removeSpeaker(speaker.id);
+                                }}
+                                className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-all"
+                                title="Remove"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

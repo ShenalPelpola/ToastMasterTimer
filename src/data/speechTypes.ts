@@ -2,12 +2,6 @@ import { SpeechType } from '../types';
 
 export const speechTypes: SpeechType[] = [
   {
-    id: 'round-robin',
-    name: 'Round Robin',
-    thresholds: { green: 0, yellow: 0, red: 20 },
-    singleThreshold: true,
-  },
-  {
     id: 'table-topics',
     name: 'Table Topics',
     thresholds: { green: 60, yellow: 90, red: 120 },

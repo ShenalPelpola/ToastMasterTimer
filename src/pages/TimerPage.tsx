@@ -135,13 +135,24 @@ export default function TimerPage() {
           controlsVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white font-body drop-shadow-lg">
-            {speaker.name}
-          </h1>
-          <p className="text-white/60 text-sm md:text-base font-body mt-0.5">
-            {speechType.name}
-          </p>
+        <div className="flex items-start gap-3">
+          <button
+            onClick={handleStop}
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all mt-0.5 shrink-0"
+            title="Back to meeting (Esc)"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white font-body drop-shadow-lg">
+              {speaker.name}
+            </h1>
+            <p className="text-white/60 text-sm md:text-base font-body mt-0.5">
+              {speechType.name}
+            </p>
+          </div>
         </div>
         <button
           onClick={() => setAudioEnabled(!audioEnabled)}

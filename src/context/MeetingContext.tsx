@@ -8,6 +8,7 @@ interface MeetingContextValue {
   removeSpeaker: (speakerId: string) => void;
   moveSpeaker: (speakerId: string, direction: 'up' | 'down') => void;
   reorderSpeakers: (fromId: string, toId: string) => void;
+  renameSpeaker: (speakerId: string, newName: string) => void;
   recordTime: (speakerId: string, elapsed: number, status: TimerColor) => void;
   resetSpeaker: (speakerId: string) => void;
   clearMeeting: () => void;
@@ -132,6 +133,18 @@ export function MeetingProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const renameSpeaker = useCallback((speakerId: string, newName: string) => {
+    setMeeting((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        speakers: prev.speakers.map((s) =>
+          s.id === speakerId ? { ...s, name: newName.trim() } : s
+        ),
+      };
+    });
+  }, []);
+
   return (
     <MeetingContext.Provider
       value={{
@@ -141,6 +154,7 @@ export function MeetingProvider({ children }: { children: ReactNode }) {
         removeSpeaker,
         moveSpeaker,
         reorderSpeakers,
+        renameSpeaker,
         recordTime,
         resetSpeaker,
         clearMeeting,
